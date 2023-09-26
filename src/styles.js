@@ -15,6 +15,7 @@ export const Content = styled.div`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	padding-bottom: 50px;
 `;
 export const Header = styled.span`
 	font-size: 28px;
@@ -73,5 +74,14 @@ export const Input = styled.input`
 	  outline: none;
    }
 `
-
+export const TotalBill = styled.div`
+ display: flex;
+ flex-direction: row;
+ justify-content: end;
+ padding-top: 15px;
+ padding-right: 35px;
+ padding-bottom: 15px;
+ font-weight: 600;
+ color: #cf309c;
+`;
 
