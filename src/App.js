@@ -17,6 +17,8 @@ import {
 	Div,
 	SpanProduct,
 	TotalBill,
+	EditInput,
+	CepField,
 } from "./styles.js";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -33,7 +35,12 @@ import ModeIcon from "@mui/icons-material/Mode";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import CheckIcon from "@mui/icons-material/Check";
 import DoNotDisturbAltIcon from "@mui/icons-material/DoNotDisturbAlt";
+import SearchIcon from '@mui/icons-material/Search';
 import {  toast  } from 'react-toastify';
+import { Modal } from "@mui/material";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import AdfScannerIcon from '@mui/icons-material/AdfScanner';
 
 const styles = {
 	listContainer: {
@@ -177,7 +184,7 @@ const StockItem = ({
 				<ListContent>
 					<Div>
 						<Span>Nome</Span>{" "}
-						<Input
+						<EditInput
 							value={product.name}
 							onChange={({ target: { value } }) =>
 								handleEditField({ field: "name", value })
@@ -186,7 +193,7 @@ const StockItem = ({
 					</Div>
 					<Div>
 						<Span>Marca</Span>
-						<Input
+						<EditInput
 							value={product.brand}
 							onChange={({ target: { value } }) =>
 								handleEditField({ field: "brand", value })
@@ -195,7 +202,7 @@ const StockItem = ({
 					</Div>
 					<Div>
 						<Span>Tipo </Span>{" "}
-						<Input
+						<EditInput
 							value={product.type}
 							onChange={({ target: { value } }) =>
 								handleEditField({ field: "type", value })
@@ -204,7 +211,7 @@ const StockItem = ({
 					</Div>
 					<Div>
 						<Span>Preço</Span>
-						<Input
+						<EditInput
 							value={product.price}
 							onChange={({ target: { value } }) =>
 								handleEditField({ field: "price", value })
@@ -213,7 +220,7 @@ const StockItem = ({
 					</Div>
 					<Div>
 						<Span>Quantidade</Span>
-						<Input
+						<EditInput
 							value={product.amount}
 							onChange={({ target: { value } }) =>
 								handleEditField({ field: "amount", value })
@@ -356,8 +363,34 @@ const useCart = ({ products }) => {
 
 function App() {
 	const [products, setProducts] = useState([]);
-
+	const [cep, setCep] = useState('');
+	const [addressData, setAddressData] = useState(null);
 	const { cart, addToCart, removeFromCart } = useCart({ products });
+	const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+	const handleGetAddress = async () => {
+		try {
+		  const data = await getAddress(cep);
+		  if (data && data.erro) {
+			toast.error('CEP não encontrado.');
+		  } else {
+			setAddressData(data);
+			handleOpen();
+		  }
+		  
+		} catch (error) {
+		  console.error('Erro:', error);
+		  
+		}
+	  };
 
 	// Função assíncrona para lidar com a adição de um novo produto
 	const handleAddProduct = async (product) => {
@@ -434,7 +467,7 @@ function App() {
 				<Header>Adicionar batom disponível a lista </Header>
 				<NewStockItemForm onAdd={handleAddProduct} />
 
-				<Header> Carrinho de compras para lojistas </Header>
+				<Header> Carrinho para o Cliente </Header>
 				<List sx={styles.listContainer}>
 					{cart.map(({ product, quantity }) => (
 						<>
@@ -449,11 +482,68 @@ function App() {
 					))}
 
 					<TotalBill>Total: R${calculateTotalPrice()}</TotalBill>
+					<CepField>
+      <Span style={{marginRight: 10}}>Digite o CEP:</Span>
+      <EditInput
+        type="text"
+        id="cepInput"
+        placeholder="Digite o CEP"
+        value={cep}
+        onChange={(e) => setCep(e.target.value)}
+      />
+      <Button
+					startIcon={<SearchIcon />}
+					color="secondary" onClick={handleGetAddress}/>
+					 
+	  </CepField>
+
 				</List>
 
-				<button onClick={() => {
-					getAddress('22775024')
-				}}>GET CEP</button>
+				<Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            width: 400,
+            bgcolor: 'background.paper',
+            border: '2px solid #dc1ac0',
+            boxShadow: 24,
+            p: 4,
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Etiqueta para Envio
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Logradouro: {addressData?.logradouro}
+          </Typography>
+		  <Typography sx={{ mt: 2 }}>
+            Número: {addressData?.siafi
+}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            Bairro: {addressData?.bairro}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            Cidade: {addressData?.localidade
+}
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            Estado: {addressData?.uf}
+          </Typography>
+		  <Typography sx={{ mt: 2 }}>
+            CEP: {addressData?.cep}
+          </Typography>
+          <Button startIcon={< AdfScannerIcon  />} color="secondary" onClick={handleClose}/>
+        </Box>
+      </Modal>
 			</Content>
 		</Container>
 	);

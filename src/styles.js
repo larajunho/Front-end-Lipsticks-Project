@@ -74,6 +74,23 @@ export const Input = styled.input`
 	  outline: none;
    }
 `
+export const EditInput = styled.input`
+    height: 30px;
+    min-width: 40px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    color: #dc1ac0; 
+    padding-left: 15px;
+   ::placeholder {
+      color:  #f3c6ed; 
+   }
+   :focus {
+      color:#dc1ac0; 
+      border: 2px solid #dc1ac0; 
+	  outline: none;
+   }
+`
 export const TotalBill = styled.div`
  display: flex;
  flex-direction: row;
@@ -84,4 +101,13 @@ export const TotalBill = styled.div`
  font-weight: 600;
  color: #cf309c;
 `;
+
+export const CepField = styled.div`
+    display: flex;
+	flex-direction:row;
+	justify-content: center;
+    align-items: center;
+	justify-items: center;
+	
+`
 
